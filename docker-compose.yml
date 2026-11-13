@@ -1,0 +1,28 @@
+# Somente a API roda no Docker. PostgreSQL roda externamente (ou no Render).
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "${API_PORT:-5080}:8080"
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
+      ASPNETCORE_URLS: http://+:8080
+      Database__Url: ${DB_URL:-}
+      Database__Host: ${DB_HOST:-host.docker.internal}
+      Database__Port: ${DB_PORT:-5432}
+      Database__Name: ${DB_NAME:-sistema_estoque_ti}
+      Database__User: ${DB_USER:-postgres}
+      Database__Password: ${DB_PASSWORD:?Configure DB_PASSWORD no arquivo .env}
+      Database__SslMode: ${DB_SSL_MODE:-Disable}
+      FrontendOrigins: ${WEB_ORIGINS:-http://localhost:5500,http://127.0.0.1:5500}
+      SeedDemoUsers: ${SEED_DEMO_USERS:-true}
+      BootstrapAdmin__Email: ${BOOTSTRAP_ADMIN_EMAIL:-}
+      BootstrapAdmin__Password: ${BOOTSTRAP_ADMIN_PASSWORD:-}
+      DemoUsers__AdminPassword: ${DEMO_ADMIN_PASSWORD:-}
+      DemoUsers__FuncionarioPassword: ${DEMO_FUNCIONARIO_PASSWORD:-}
+      DemoUsers__VendedorPassword: ${DEMO_VENDEDOR_PASSWORD:-}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
